@@ -48,7 +48,7 @@ export default function Dashboard() {
     ]).then(([pRes, sRes, qRes]) => {
       if (pRes.status === 'success') setPrizes(pRes.data);
       if (sRes.status === 'success') setSummary(sRes.data);
-      if (qRes.status === 'success' && qRes.data?.length > 0) setTodayQuestion(qRes.data[0]);
+      if (qRes.status === 'success' && qRes.data?.questions?.length > 0) setTodayQuestion(qRes.data.questions[0]);
     }).finally(() => {
       setLoading(false);
     });
@@ -92,7 +92,7 @@ export default function Dashboard() {
               <Flame size={32} className="text-primary animate-float" />
             </div>
             <div>
-              <h1 className="text-2xl font-black text-white">Chào, {user?.name?.split(' ')[0] || 'Player'}!</h1>
+              <h1 className="text-2xl font-black text-white">Chào, {user?.name || 'Player'}!</h1>
               <p className="text-neutral-500 text-sm">Hôm nay hãy tiếp tục bứt phá nhé!</p>
             </div>
           </div>

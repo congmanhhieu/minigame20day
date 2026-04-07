@@ -20,7 +20,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch('/users/me')
+    apiFetch('/auth/me')
       .then(res => {
         if (res.status === 'success' && res.data) {
           setHistory(res.data.history || []);

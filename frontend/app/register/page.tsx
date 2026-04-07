@@ -2,36 +2,34 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Gamepad2, Loader2 } from 'lucide-react';
-import { useAuthStore } from '@/lib/store/useAuthStore';
+import { ArrowLeft, UserPlus, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const setAuth = useAuthStore((state) => state.setAuth);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
       const data = await res.json();
 
       if (res.ok && data.status === 'success') {
-        setAuth(data.data.user, data.data.token);
-        router.push(data.data.user.role === 'admin' ? '/admin' : '/dashboard');
+        router.push('/login');
       } else {
-        setError(data.message || 'Đăng nhập thất bại.');
+        setError(data.message || 'Đăng ký thất bại.');
       }
     } catch (err) {
       setError('Lỗi kết nối. Vui lòng thử lại sau.');
@@ -53,18 +51,29 @@ export default function LoginPage() {
 
           <div className="text-center space-y-3">
             <div className="w-16 h-16 bg-gradient-to-br from-primary to-orange-500 rounded-2xl flex items-center justify-center mx-auto animate-float">
-              <Gamepad2 size={32} className="text-white" />
+              <UserPlus size={32} className="text-white" />
             </div>
-            <h1 className="text-3xl font-black tracking-tight">Đăng nhập</h1>
-            <p className="text-neutral-500 text-sm">Điền thông tin để tiếp tục trò chơi</p>
+            <h1 className="text-3xl font-black tracking-tight">Tạo tài khoản</h1>
+            <p className="text-neutral-500 text-sm">Điền thông tin để bắt đầu tham gia</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-4">
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm px-4 py-3 rounded-xl font-medium">
                 {error}
               </div>
             )}
+            <div>
+              <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest block mb-2">Họ và tên</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-white outline-none focus:border-primary transition"
+                placeholder="VD: Nguyễn Văn A"
+              />
+            </div>
             <div>
               <label className="text-xs font-bold text-neutral-400 uppercase tracking-widest block mb-2">Email</label>
               <input
@@ -84,7 +93,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-white outline-none focus:border-primary transition"
-                placeholder="Nhập mật khẩu"
+                placeholder="Tạo mật khẩu"
               />
             </div>
 
@@ -93,12 +102,12 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-4 rounded-xl font-black shadow-lg shadow-primary/20 hover:scale-[1.02] transition active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
             >
-              {loading ? <Loader2 size={20} className="animate-spin" /> : 'ĐĂNG NHẬP'}
+              {loading ? <Loader2 size={20} className="animate-spin" /> : 'ĐĂNG KÝ'}
             </button>
           </form>
 
           <div className="text-center text-sm text-neutral-500 pt-2 border-t border-white/5">
-            Chưa có tài khoản? <Link href="/register" className="text-primary font-bold hover:underline">Đăng ký ngay</Link>
+            Đã có tài khoản? <Link href="/login" className="text-primary font-bold hover:underline">Đăng nhập</Link>
           </div>
         </div>
       </main>

@@ -5,7 +5,7 @@ import { Gift, Plus, Trash2, Edit2, Package, Award, ChevronLeft, List } from 'lu
 import { apiFetch } from '@/lib/api';
 
 interface Prize {
-  id: number;
+  id: string;
   program_id: number;
   date: string | null;
   name: string;
@@ -20,7 +20,7 @@ export default function AdminPrizesPage() {
   const [error, setError] = useState('');
 
   // Form state
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
@@ -63,7 +63,7 @@ export default function AdminPrizesPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa giải thưởng này?')) return;
     try {
       const res = await apiFetch(`/admin/prizes/${id}`, { method: 'DELETE' });

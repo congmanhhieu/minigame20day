@@ -58,7 +58,7 @@ CREATE DATABASE minigame20day WITH ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' 
 
 
 # 3. Import Schema (đảm bảo file schema.sql từ thư mục backend đang nằm ở server)
-psql -U minigame_user -d minigame20day -h 127.0.0.1 -W < backend/schema.sql
+psql -U postgres -d minigame20day -h 127.0.0.1 -W < backend/schema.sql
 ```
 
 ---

@@ -5,7 +5,7 @@ import { apiFetch } from '@/lib/api';
 import { HelpCircle, Plus, CopyPlus, Trash, Edit2, List, CalendarCheck } from 'lucide-react';
 
 interface Question {
-  id: number;
+  id: string;
   question_text: string;
   options: string[];
   correct_option_id: number | null;
@@ -18,7 +18,7 @@ export default function QuestionsPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Form states
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState(['', '']);
   const [correctOption, setCorrectOption] = useState<number | null>(null);
@@ -127,12 +127,8 @@ export default function QuestionsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDelete = async (id: number, date: string) => {
-    if (date < todayStr) {
-      alert("Câu hỏi đã qua không được phép xóa!");
-      return;
-    }
-    if (!confirm("Bạn có chắc chắn muốn xóa câu hỏi này không?")) return;
+  const handleDelete = async (id: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) return;
 
     try {
       const res = await apiFetch(`/admin/questions/${id}`, { method: 'DELETE' });
@@ -315,7 +311,7 @@ export default function QuestionsPage() {
                         </div>
                       </div>
 
-                      {!isPast && (
+                      {(!isPast && !isToday) && (
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleEdit(q)}
@@ -324,7 +320,7 @@ export default function QuestionsPage() {
                             <Edit2 size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(q.id, q.active_date.split('T')[0])}
+                            onClick={() => handleDelete(q.id)}
                             className="p-2 text-neutral-400 hover:text-red-500 transition rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
                           >
                             <Trash size={16} />

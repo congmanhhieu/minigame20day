@@ -24,35 +24,17 @@ export default function PlayPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      apiFetch('/game/questions/today'),
-      apiFetch('/users/me')
-    ]).then(([qRes, uRes]) => {
+    apiFetch('/game/questions/today').then(qRes => {
       if (qRes.status === 'success' && qRes.data) {
-        setQuestions(qRes.data);
+        setQuestions(qRes.data.questions || []);
+
+        if (qRes.data.isSubbed) {
+          setIsSubbed(true);
+          setSelections(qRes.data.previousAnswers || {});
+          setGlobalPrediction(qRes.data.globalPrediction || 0);
+        }
       } else {
         setQuestions([]);
-      }
-
-      if (uRes.status === 'success' && uRes.data?.history) {
-        const sels: Record<number, number> = {};
-        let pred: number | '' = '';
-        let hasHistory = false;
-        const todayStr = new Date().toISOString().split('T')[0];
-
-        uRes.data.history.forEach((h: any) => {
-          if (h.date === todayStr && h.question_id) {
-            hasHistory = true;
-            sels[h.question_id] = h.chosen_option_id || 0;
-            pred = h.prediction || 0;
-          }
-        });
-
-        if (hasHistory) {
-          setIsSubbed(true);
-          setSelections(sels);
-          setGlobalPrediction(pred);
-        }
       }
     }).catch(err => {
       console.error(err);

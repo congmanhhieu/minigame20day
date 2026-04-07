@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 type User = {
-  id: number;
+  id: string | number;
   name: string;
   email: string;
   role: string;

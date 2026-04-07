@@ -21,19 +21,19 @@ export default function AdminLoginPage() {
     setError('');
 
     try {
-      const res = await apiFetch('/auth/admin/login', {
+      const res = await apiFetch('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
 
       if (res.status === 'success' && res.data.token) {
-        setAuth({
-          id: 999,
-          name: 'System Administrator',
-          email: email,
-          role: 'admin',
-          total_score: 0
-        }, res.data.token);
+        if (res.data.user.role !== 'admin') {
+          setError('Tài khoản không có quyền quản trị viên.');
+          setLoading(false);
+          return;
+        }
+
+        setAuth(res.data.user, res.data.token);
 
         router.push('/admin');
       } else {
