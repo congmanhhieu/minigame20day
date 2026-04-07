@@ -18,6 +18,7 @@ type Config struct {
 	FacebookClientID     string
 	FacebookClientSecret string
 	FacebookRedirectURL  string
+	FrontendURL          string
 }
 
 func LoadConfig() *Config {
@@ -37,6 +38,7 @@ func LoadConfig() *Config {
 		FacebookClientID:     getEnv("FACEBOOK_CLIENT_ID", ""),
 		FacebookClientSecret: getEnv("FACEBOOK_CLIENT_SECRET", ""),
 		FacebookRedirectURL:  getEnv("FACEBOOK_REDIRECT_URL", ""),
+		FrontendURL:          getEnv("FRONTEND_URL", "http://localhost:3000"),
 	}
 }
 

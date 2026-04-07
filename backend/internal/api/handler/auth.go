@@ -177,8 +177,8 @@ func (h *AuthHandler) OAuthCallback(c *gin.Context) {
 	}
 
 	// Redirect to frontend callback page with token
-	frontendURL := fmt.Sprintf("http://localhost:3000/auth/callback?token=%s&name=%s&email=%s&id=%d",
-		token, url.QueryEscape(name), url.QueryEscape(email), userID)
+	frontendURL := fmt.Sprintf("%s/auth/callback?token=%s&name=%s&email=%s&id=%d",
+		h.cfg.FrontendURL, token, url.QueryEscape(name), url.QueryEscape(email), userID)
 	c.Redirect(http.StatusTemporaryRedirect, frontendURL)
 }
 
