@@ -32,9 +32,9 @@ func main() {
 	// 4. Setup Gin Router
 	r := api.SetupRouter(cfg, dbPool, redisClient, scoreService)
 
-	// 4.5 Setup Cron Job for daily score calculation at 23:55 (server time)
+	// 4.5 Setup Cron Job for daily score calculation at 00:00 (server time)
 	c := cron.New()
-	_, err := c.AddFunc("55 23 * * *", func() {
+	_, err := c.AddFunc("00 00 * * *", func() {
 		today := time.Now().Format("2006-01-02")
 		log.Printf("CRON: Starting daily score calculation for date: %s", today)
 		if err := scoreService.CalculateDailyScores(context.Background(), today); err != nil {
