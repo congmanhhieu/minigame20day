@@ -8,8 +8,9 @@ export async function GET() {
     const user = await verifyUser();
     if (!user) return NextResponse.json({ status: 'error', message: 'Unauthorized' }, { status: 401 });
 
-    const yest = new Date(Date.now() - 86400000);
-    const yesterdayDateStr = yest.toISOString().split('T')[0];
+    const nowICT = new Date(Date.now() + 7 * 3600000);
+    const yestICT = new Date(nowICT.getTime() - 86400000);
+    const yesterdayDateStr = yestICT.toISOString().split('T')[0];
 
     await dbConnect();
 
@@ -19,7 +20,8 @@ export async function GET() {
       {
         $group: {
           _id: "$user",
-          daily_score: { $sum: "$score" }
+          daily_score: { $sum: "$score" },
+          correct_count: { $sum: { $cond: [{ $gt: ["$score", 0] }, 1, 0] } }
         }
       }
     ];
@@ -47,7 +49,8 @@ export async function GET() {
     return NextResponse.json({
       status: 'success',
       data: {
-        correct_count,
+        correct_count: myResult ? myResult.correct_count : 0,
+        score: myScore,
         rank
       }
     });

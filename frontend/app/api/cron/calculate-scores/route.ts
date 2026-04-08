@@ -6,7 +6,9 @@ import Answer from '@/models/Answer';
 export async function POST(req: Request) {
   try {
     const url = new URL(req.url);
-    const date = url.searchParams.get('date') || new Date().toISOString().split('T')[0];
+    // Use ICT (GMT+7) for date calculation
+    const nowICT = new Date(Date.now() + 7 * 3600000);
+    const date = url.searchParams.get('date') || nowICT.toISOString().split('T')[0];
 
     // In production, add a secret cron key to prevent public execution
     // e.g. if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) ...
@@ -45,6 +47,7 @@ export async function POST(req: Request) {
         actualCorrectCount++;
       }
     }
+    const totalParticipants = userAnsMap.size;
 
     // 3. Process each answer
     const bulkOps = [];
@@ -53,16 +56,12 @@ export async function POST(req: Request) {
       const qStr = ans.question.toString();
 
       if (qMap.has(qStr) && qMap.get(qStr) === ans.chosen_option_id) {
-        let maxVal = Math.max(actualCorrectCount, ans.predicted_correct_count);
-
-        if (maxVal === 0) {
-          score = 100;
-        } else {
-          const diff = Math.abs(ans.predicted_correct_count - actualCorrectCount);
-          let accuracy = 1.0 - (diff / maxVal);
-          if (accuracy < 0) accuracy = 0;
-          score = Math.round(100.0 * accuracy);
-        }
+        const diff = Math.abs(ans.predicted_correct_count - actualCorrectCount);
+        // Accuracy factor capped at 0 to avoid negative scores
+        const accuracy = Math.max(0, 1 - (diff / totalParticipants));
+        const multiplier = 1 + accuracy;
+        const baseScore = 100;
+        score = Math.round(baseScore * multiplier);
       }
 
       bulkOps.push({

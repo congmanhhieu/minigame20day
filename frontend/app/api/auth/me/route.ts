@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
+import Answer from '@/models/Answer';
+import Question from '@/models/Question';
 import { headers } from 'next/headers';
 
 export async function GET(req: Request) {
@@ -30,6 +32,24 @@ export async function GET(req: Request) {
       return NextResponse.json({ status: 'error', message: 'User not found' }, { status: 404 });
     }
 
+    // Fetch history
+    const answers = await Answer.find({ user: user._id })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .populate('question', 'question_text');
+
+    const history = answers.map((ans: any) => ({
+      answer_id: ans._id,
+      question: ans.question?.question_text || 'Unknown Question',
+      prediction: ans.predicted_correct_count,
+      score: ans.score,
+      date: ans.date,
+    }));
+
+    // Calculate total score from all time
+    const allAnswers = await Answer.find({ user: user._id });
+    const total_score = allAnswers.reduce((acc, curr) => acc + (curr.score || 0), 0);
+
     return NextResponse.json({
       status: 'success',
       data: {
@@ -37,6 +57,8 @@ export async function GET(req: Request) {
         name: user.name,
         email: user.email,
         role: user.role,
+        total_score,
+        history
       }
     });
 

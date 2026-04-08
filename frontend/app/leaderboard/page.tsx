@@ -21,9 +21,12 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     setLoading(true);
-    const today = new Date().toISOString().split('T')[0];
+    const nowICT = new Date(Date.now() + 7 * 3600000);
+    const today = nowICT.toISOString().split('T')[0];
+    const yesterday = new Date(nowICT.getTime() - 86400000).toISOString().split('T')[0];
+
     const endpoint = tab === 'daily'
-      ? `/leaderboard/daily?date=${today}`
+      ? `/leaderboard/daily?date=${yesterday}`
       : '/leaderboard/overall';
 
     apiFetch(endpoint)

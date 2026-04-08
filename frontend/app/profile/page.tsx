@@ -17,6 +17,7 @@ interface HistoryEntry {
 export default function ProfilePage() {
   const { user, logout } = useAuthStore();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [totalScore, setTotalScore] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function ProfilePage() {
       .then(res => {
         if (res.status === 'success' && res.data) {
           setHistory(res.data.history || []);
+          setTotalScore(res.data.total_score || 0);
         }
       })
       .catch(() => { })
@@ -35,9 +37,9 @@ export default function ProfilePage() {
     window.location.href = '/login';
   };
 
-  const totalScore = history.reduce((acc, h) => acc + h.score, 0);
-  const perfectCount = history.filter(h => h.score === 100).length;
-  const avgScore = history.length > 0 ? Math.round(totalScore / history.length) : 0;
+  // Stat calculations
+  const perfectCount = history.filter(h => h.score >= 100).length;
+  const avgScore = history.length > 0 ? Math.round(history.reduce((acc, h) => acc + h.score, 0) / history.length) : 0;
 
   return (
     <div className="game-page pb-20 relative overflow-hidden">
@@ -126,13 +128,13 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-neutral-600 font-medium">{item.date}</span>
                     <span className={`px-3 py-1 rounded-full text-xs font-black
-                      ${item.score === 100
+                      ${item.score >= 100
                         ? 'bg-green-500/20 text-green-400 border border-green-500/20'
-                        : item.score >= 70
+                        : item.score > 0
                           ? 'bg-primary/15 text-primary border border-primary/20'
                           : 'bg-white/5 text-neutral-400 border border-white/10'
                       }`}>
-                      {item.score === 100 ? '🎯 ' : ''}{item.score} điểm
+                      {item.score >= 100 ? '🎯 ' : ''}{item.score} điểm
                     </span>
                   </div>
                   <p className="font-semibold text-sm mb-2 text-neutral-200">{item.question}</p>
